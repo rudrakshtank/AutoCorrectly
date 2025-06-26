@@ -1,25 +1,21 @@
 import streamlit as st
-from symspellpy.symspellpy import SymSpell, Verbosity
-import os
+from spellchecker import SpellChecker
 
-st.set_page_config(page_title="SymSpell Spell Checker")
+spell = SpellChecker()
 
-sym_spell = SymSpell(max_dictionary_edit_distance=6)
+st.title("🔍 Instant Spell Correction Engine")
 
-dictionary_path = "frequency_dictionary_en_82_765.txt"
-if not os.path.exists(dictionary_path):
-    st.error("Dictionary file not found.")
-else:
-    sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
+user_input = st.text_input("Type some misspelled word here:")
 
-    st.title("🔍 SymSpell Spell Checker")
+if user_input:
+    words = user_input.split()
+    corrected = []
 
-    user_input = st.text_input("Enter a word:")
-    if user_input:
-        suggestions = sym_spell.lookup(user_input, Verbosity.CLOSEST, max_edit_distance=6)
-        if suggestions:
-            st.write("Suggestions:")
-            for suggestion in suggestions:
-                st.write("→", suggestion.term)
-        else:
-            st.write("No suggestions found.")
+    for word in words:
+        fixed = spell.correction(word)
+        corrected.append(fixed if fixed is not None else word)
+
+    corrected_text = " ".join(corrected)
+
+    st.markdown("**Corrected:**")
+    st.success(corrected_text)
